@@ -1,42 +1,61 @@
 import pyperclip
+import tkinter as tk
+from tkinter import simpledialog, Label, Radiobutton, StringVar
 
-# The string to be encrypted and decrypted. #
-message = 'This is my secret message.'
+# Function to perform the encryption/decryption
+def encrypt_decrypt(message, key, mode):
+    SYMBOLS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 !?.'
+    translated = ''
+    
+    for symbol in message:
+        if symbol in SYMBOLS:
+            symbolIndex = SYMBOLS.find(symbol)
 
-# The encryption and decrption key:
-key = 13
+            if mode == 'encrypt':
+                translatedIndex = symbolIndex + key
+            elif mode == 'decrypt':
+                translatedIndex = symbolIndex - key
 
-# Whether the program encrypts of decrypts:
-mode = 'encrypt' # Set to either 'encrypt' or 'decrypt'.
+            if translatedIndex >= len(SYMBOLS):
+                translatedIndex -= len(SYMBOLS)
+            elif translatedIndex < 0:
+                translatedIndex += len(SYMBOLS)
 
-# Every possible symbol that can be encrypted:
-SYMBOLS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 !?.'
+            translated += SYMBOLS[translatedIndex]
+        else:
+            translated += symbol
 
-# Store the encrypted/decrypted form of the message:
-translated = ''
+    return translated
 
-for symbol in message:
-    # Note: Only symbols in the SYMBOLS string can be encrypted/decrypted.
-    if symbol in SYMBOLS:
-        symbolIndex = SYMBOLS.find(symbol)
+# Create the main window
+root = tk.Tk()
+root.title("Message Encryptor/Decryptor")
 
-        # Perform ecnryption/decryption:
-        if mode == 'encrypt':
-            translatedIndex = symbolIndex + key
-        elif mode == 'decrypt':
-            translatedIndex = symbolIndex - key
+# Mode selection variable
+mode = StringVar()
+mode.set("encrypt")  # Set default mode to encrypt
 
-        # Handle wraparound, if needed:
-        if translatedIndex >= len(SYMBOLS):
-            translatedIndex = translatedIndex - len(SYMBOLS)
-        elif translatedIndex < 0:
-            translatedIndex = translatedIndex +len(SYMBOLS)
+# Function to get user input and display the result
+def process_input():
+    message = simpledialog.askstring("Input", "Enter your message:", parent=root)
+    key = simpledialog.askinteger("Input", "Enter the key (0-25):", parent=root, minvalue=0, maxvalue=25)
 
-        translated = translated + SYMBOLS[translatedIndex]
-    else:
-        # Append the symbol without encryption/decryption:
-        translated = translated + symbol
+    if message and key is not None:
+        processed_message = encrypt_decrypt(message, key, mode.get())
+        result_label.config(text=f"Processed Message: {processed_message}")
+        pyperclip.copy(processed_message)
 
-# Output the translated string:
-print(translated)
-pyperclip.copy(translated)
+# Radio buttons for mode selection
+Radiobutton(root, text="Encrypt", variable=mode, value="encrypt").pack()
+Radiobutton(root, text="Decrypt", variable=mode, value="decrypt").pack()
+
+# Button to trigger processing
+process_button = tk.Button(root, text="Process Message", command=process_input)
+process_button.pack()
+
+# Label to display the result
+result_label = Label(root, text="Processed Message: None")
+result_label.pack()
+
+# Start the GUI event loop
+root.mainloop()
