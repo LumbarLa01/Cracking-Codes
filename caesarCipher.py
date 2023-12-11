@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import simpledialog, Label, Radiobutton, StringVar
 
 # Function to perform the encryption/decryption
+# SYMBOLS are items that are encrypted and decrypted. The ceasar cipher checks agains this symbol.
 def encrypt_decrypt(message, key, mode):
     SYMBOLS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 !?.'
     translated = ''
@@ -31,9 +32,10 @@ def encrypt_decrypt(message, key, mode):
 root = tk.Tk()
 root.title("Message Encryptor/Decryptor")
 
-# Mode selection variable
+# Mode selection variable between encryption/decryption
 mode = StringVar()
-mode.set("encrypt")  # Set default mode to encrypt
+# Set default mode to encrypt
+mode.set("encrypt")
 
 # Function to get user input and display the result
 def process_input():
